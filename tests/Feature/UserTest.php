@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Artisan;
 use Laravel\Passport\Client;
 use Illuminate\Support\Facades\Http;
 
-class UsuarioTest extends TestCase
+class UserTest extends TestCase
 {
     public function test_ObtenerTokenConClientIdValido()
     {
@@ -17,16 +17,16 @@ class UsuarioTest extends TestCase
             '--password' => true,
             '--no-interaction'=>true,
             '--name'=>'Test Client',
-        ]);
+        ]);        
             
         $client = Client::findOrFail(2);
 
         $response = $this->post('/oauth/token',[
-            "username" => "usuario@usuario",
+            "username" => "usuario@placeholder.com",
             "password" => "1234",
             "grant_type" => "password",
             "client_id" => "2",
-            "client_secret" => $client -> secret
+            "client_secret" => $client->secret
         ]);
 
         $response->assertStatus(200);
@@ -40,16 +40,16 @@ class UsuarioTest extends TestCase
         $response->assertJsonFragment([
             "token_type" => "Bearer"
         ]);
+
     }
 
     public function test_ObtenerTokenConClientIdInvalido()
     {
         $response = $this->post('/oauth/token',[
             "grant_type" => "password",
-            "client_id" => "999",
-            "client_secret" => "aaaaaaaaaa"
+            "client_id" => "234",
+            "client_secret" => "clientInvalido"
         ]);
-
         $response->assertStatus(401);
         $response->assertJsonFragment([
             "error" => "invalid_client",
@@ -60,15 +60,17 @@ class UsuarioTest extends TestCase
 
     public function test_ValidarTokenSinEnviarToken()
     {
-        $response = $this->get('/api/v1/validate');
+        $response = $this->get('/api/v2/validar');
+
         $response->assertStatus(500);
     }
 
     public function test_ValidarTokenConTokenInvalido()
     {
-        $response = $this->get('/api/v1/validate',[
-            [ "Authorization" => "TokenInvalido"]
+        $response = $this->get('/api/v2/validar', [
+            [ "Authorization" => "Token Invalido"]
         ]);
+
         $response->assertStatus(500);
     }
 
@@ -76,51 +78,52 @@ class UsuarioTest extends TestCase
     {
         $client = Client::findOrFail(2);
         $tokenResponse = $this -> post("/oauth/token",[
-            "username" => "usuario@usuario",
+            "username" => "usuario@placeholder.com",
             "password" => "1234",
             "grant_type" => "password",
             "client_id" => "2",
             "client_secret" => $client -> secret
         ]);
 
-        $token = json_decode($tokenResponse -> content(),true);
+        $token = json_decode($tokenResponse->content(), true);
         
-        $response = $this->get('/api/v1/validate',
+        $response = $this->get('/api/v2/validar',
             [ "Authorization" => "Bearer " . $token ['access_token']]
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(200); 
     }
 
     public function test_LogoutSinToken()
     {
-        $response = $this->get('/api/v1/logout');
+        $response = $this->get('/api/v2/logout');
+
         $response->assertStatus(500);
     }
 
     public function test_LogoutConTokenInvalido()
     {
-        $response = $this->get('/api/v1/logout',[
-            [ "Authorization" => "TokenInvalido"]
+        $response = $this->get('/api/v2/logout', [
+            [ "Authorization" => "Token Invalido" ]
         ]);
+
         $response->assertStatus(500);
-        
     }
 
     public function test_LogoutConTokenValido()
     {
         $client = Client::findOrFail(2);
-        $tokenResponse = $this -> post("/oauth/token",[
-            "username" => "usuario@usuario",
+        $tokenResponse = $this->post("/oauth/token", [
+            "username" => "usuario@placeholder.com",
             "password" => "1234",
             "grant_type" => "password",
             "client_id" => "2",
-            "client_secret" => $client -> secret
+            "client_secret" => $client->secret
         ]);
 
-        $token = json_decode($tokenResponse -> content(),true);
+        $token = json_decode($tokenResponse->content(), true);
         
-        $response = $this->get('/api/v1/logout',
+        $response = $this->get('/api/v2/logout',
             [ "Authorization" => "Bearer " . $token ['access_token']]
         );
 
