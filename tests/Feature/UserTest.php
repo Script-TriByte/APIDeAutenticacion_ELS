@@ -19,13 +19,13 @@ class UserTest extends TestCase
             '--name'=>'Test Client',
         ]);        
             
-        $client = Client::findOrFail(2);
+        $client = Client::findOrFail(1);
 
         $response = $this->post('/oauth/token',[
             "username" => "usuario@placeholder.com",
             "password" => "1234",
             "grant_type" => "password",
-            "client_id" => "2",
+            "client_id" => "1",
             "client_secret" => $client->secret
         ]);
 
