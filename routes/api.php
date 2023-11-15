@@ -15,3 +15,14 @@ Route::prefix('v1')->group(function ()
 
 
 });
+
+Route::prefix('v2')->middleware('auth:api')->group(function ()
+{
+    Route::get('/validar',
+        [UsuarioController::class,"ValidarToken"]
+    );
+
+    Route::get('/logout',
+        [UsuarioController::class,"Logout"]
+    );
+});
