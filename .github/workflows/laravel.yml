@@ -36,12 +36,12 @@ jobs:
       run: php artisan key:generate
     - name: Implementar passport-keys
       run: php artisan passport:keys
-    - name: Implementar passport-client
-      run: php artisan passport:client --password
     - name: Asignar permisos
       run: chmod -R 777 storage bootstrap/cache
     - name: Correr migraciones
       run: php artisan migrate
+    - name: Implementar passport-client
+      run: php artisan passport:client --password
     - name: Crear tablas en MySQL
       run: mysql -h 127.0.0.1 -u root -e "source tables.sql" scripttribyte
     - name: Correr seeders
