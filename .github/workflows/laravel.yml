@@ -1,0 +1,46 @@
+name: Laravel
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  laravel-tests:
+
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: scripttribyte
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+      with:
+        php-version: '8.0'
+    - uses: actions/checkout@v3
+    - name: Copiar .env
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+    - name: Actualizar dependencias
+      run: composer update
+    - name: Instalar dependencias
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Generar key
+      run: php artisan key:generate
+    - name: Asignar permisos
+      run: chmod -R 777 storage bootstrap/cache
+    - name: Correr migraciones
+      run: php artisan migrate
+    - name: Crear tablas en MySQL
+      run: mysql -h 127.0.0.1 -u root -e "source tables.sql" scripttribyte
+    - name: Correr seeders
+      run: php artisan db:seed
+    - name: Correr tests
+      run: php artisan test
