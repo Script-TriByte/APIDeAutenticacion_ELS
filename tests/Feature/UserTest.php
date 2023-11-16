@@ -17,15 +17,15 @@ class UserTest extends TestCase
             '--password' => true,
             '--no-interaction'=>true,
             '--name'=>'Test Client',
-        ]);        
+        ]);    
             
-        $client = Client::findOrFail(2);
+        $client = Client::all()->first();
 
         $response = $this->post('/oauth/token',[
             "username" => "usuario@placeholder.com",
             "password" => "1234",
             "grant_type" => "password",
-            "client_id" => "2",
+            "client_id" => $client->id,
             "client_secret" => $client->secret
         ]);
 
@@ -40,14 +40,13 @@ class UserTest extends TestCase
         $response->assertJsonFragment([
             "token_type" => "Bearer"
         ]);
-
     }
 
     public function test_ObtenerTokenConClientIdInvalido()
     {
         $response = $this->post('/oauth/token',[
             "grant_type" => "password",
-            "client_id" => "234",
+            "client_id" => "12345",
             "client_secret" => "clientInvalido"
         ]);
         $response->assertStatus(401);
