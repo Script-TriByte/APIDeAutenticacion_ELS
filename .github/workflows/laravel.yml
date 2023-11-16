@@ -41,7 +41,7 @@ jobs:
     - name: Correr migraciones
       run: php artisan migrate
     - name: Implementar passport-client
-      run: php artisan passport:client --password
+      run: php artisan passport:client --password --no-interaction --name "test"
     - name: Crear tablas en MySQL
       run: mysql -h 127.0.0.1 -u root -e "source tables.sql" scripttribyte
     - name: Correr seeders

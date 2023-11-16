@@ -17,7 +17,7 @@ class UserTest extends TestCase
             '--password' => true,
             '--no-interaction'=>true,
             '--name'=>'Test Client',
-        ]);        
+        ]);    
             
         $client = Client::all()->first();
 
